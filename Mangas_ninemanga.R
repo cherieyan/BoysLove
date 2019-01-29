@@ -74,48 +74,47 @@ unlistTitulosgenero <- gsub("[()]","",unlistTitulosgenero)
 unlistTitulosgenero <- gsub("[:]","",unlistTitulosgenero)
 unlistTitulosgenero <- gsub("\n","-",unlistTitulosgenero)
 
-
 # Generando data de titulos views y genero
-DATOS2 <- data.frame(TITULO = unlistTitulostitulos[1:2458], VISITAS = as.numeric(unlistTitulosviews)[1:2458], GENERO = unlistTitulosgenero)
+DATOS2 <- data.frame(TITULO = unlistTitulostitulos[1:2000], VISITAS = as.numeric(unlistTitulosviews)[1:2000], GENERO = unlistTitulosgenero[1:2000])
 write.csv(DATOS2,file="Tabla1.csv")
 
 
-#Separando por espacio los generos y pasando a minuscula
-unlistgeneros2 <- unlist(Generos)
-unlistgeneros2 <- gsub("Género","",unlistgeneros2)
-unlistgeneros2 <- gsub("[()]","",unlistgeneros2)
-unlistgeneros2 <- gsub("[:]","",unlistgeneros2)
-unlistgeneros2 <- gsub("\n","-",unlistgeneros2)
-
-unlistgeneros2 <- strsplit(unlistgeneros2,"-")
-unlistgeneros2 <- tolower(unlistgeneros2)
-
-
-print(unlistgeneros2)
+#### Contando los generos ###
+Genre2 <- list()
+for(i in 1:length(resultMangas)){
+  Genre2 <- c(Genre2,genero2)
+}
 
 #unificar generos
 totalgeneros <- ""
-for(i in 1:length(unlistgeneros2)){
-  totalgeneros<-paste(totalgeneros," ",unlistgeneros2[[i]])
+for(i in 1:length(Genre2)){
+  totalgeneros<-paste(totalgeneros," ",Genre2[[i]])
 }
 
 print(totalgeneros)
 
-#Tabla para extraer generos
+totalgeneros <- gsub("Género","",totalgeneros)
+totalgeneros <- gsub("[()]","",totalgeneros)
+totalgeneros <- gsub("[:]","",totalgeneros)
+totalgeneros <- gsub("\n","-",totalgeneros)
+
+totalgeneros <- strsplit(totalgeneros,"-")[[1]]
+totalgeneros <- tolower(totalgeneros)
+totalgeneros <- strsplit(totalgeneros,",")[[1]]
+
+
 contgenre <- unlist(totalgeneros)
+
 tablagenre <- table(contgenre)
 
-dfGenero <- as.data.frame(tablagenre)
+dftablaGeneros <- as.data.frame(tablagenre)
 
 
-grafico_view <- ggplot(DATOS, aes(TITULO, VISITAS)) +
-  geom_bar(stat = "identity",fill = rgb(0.2, 0.2, 1, 0.3), color = "blue") +
-  coord_flip() + 
-  theme_minimal()
 
+###Grafico
+library("ggplot2")
 
-#no salio
-grafico_genero <- ggplot(datos, aes(unlistTitulosgenero, Var1)) +
-  geom_bar(stat = "identity",fill = rgb(0.2, 0.2, 1, 0.3), color = "blue") +
-  coord_flip() + 
-  theme_minimal()
+dftablaGeneros %>%
+  ggplot()+
+  aes(x=contgenre, y=Freq) +
+  geom_bar (stat="identity")
